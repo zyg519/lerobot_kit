@@ -75,7 +75,7 @@ if TYPE_CHECKING or _peft_available:
 else:
     PeftModel = None
 
-from .lerobot_eval import eval_policy_all
+from lerobot.scripts.lerobot_eval import eval_policy_all
 
 
 @contextmanager
