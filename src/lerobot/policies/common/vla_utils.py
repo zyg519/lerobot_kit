@@ -84,8 +84,8 @@ def make_att_2d_masks(pad_masks: Tensor, att_masks: Tensor) -> Tensor:  # see op
     if pad_masks.ndim != 2:
         raise ValueError(pad_masks.ndim)
 
-    cumsum = torch.cumsum(att_masks, dim=1)
-    att_2d_masks = cumsum[:, None, :] <= cumsum[:, :, None]
+    cumsum = torch.cumsum(att_masks, dim=1)  # 获取每个 token 的块的 id
+    att_2d_masks = cumsum[:, None, :] <= cumsum[:, :, None]  # 每个 token 只能看到块 id 和自己相同或者小于自己的块 id
     pad_2d_masks = pad_masks[:, None, :] * pad_masks[:, :, None]
     return att_2d_masks & pad_2d_masks
 

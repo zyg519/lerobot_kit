@@ -247,7 +247,7 @@ def register_third_party_plugins() -> None:
             logging.exception("Could not import third-party plugin: %s", module_name)
             failed.append(module_name)
 
-    for dist in importlib.metadata.distributions():
+    for dist in importlib.metadata.distributions(): # 用来获取当前环境全部已安装包的元数据，等价于 pip list 的底层 API
         dist_name = dist.metadata.get("Name")
         if not dist_name:
             continue

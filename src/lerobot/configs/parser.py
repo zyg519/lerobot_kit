@@ -393,7 +393,7 @@ def wrap(config_path: Path | None = None) -> Callable[[F], F]:
     def wrapper_outer(fn: F) -> F:
         @wraps(fn)
         def wrapper_inner(*args: Any, **kwargs: Any) -> Any:
-            argspec = inspect.getfullargspec(fn)
+            argspec = inspect.getfullargspec(fn) # 获取函数完整参数签名，返回 FullArgSpec 对象
             argtype = argspec.annotations[argspec.args[0]]
             if len(args) > 0 and type(args[0]) is argtype:
                 cfg = args[0]
@@ -425,7 +425,7 @@ def wrap(config_path: Path | None = None) -> Callable[[F], F]:
                     else:
                         if config_path_cli:
                             cli_args = filter_arg("config_path", cli_args)
-                        cfg = draccus.parse(
+                        cfg = draccus.parse(       # 根据模板 (dataclass)，把普通字典变成配置对象，自动做类型转换、嵌套解析、填充默认值
                             config_class=argtype,
                             config_path=config_path_cli or config_path,
                             args=cli_args,

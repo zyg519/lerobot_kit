@@ -797,7 +797,7 @@ def _remote_target_in_argv() -> bool:
 
 
 def main():
-    register_third_party_plugins()
+    register_third_party_plugins()   # import 相关的包
     if _remote_target_in_argv():
         # The policy device is resolved on the remote pod, not here, so silence the
         # client-side "Device '...' is not available" warning PreTrainedConfig emits

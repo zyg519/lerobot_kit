@@ -206,16 +206,16 @@ class PaliGemmaWithExpertModel(
         vlm_config_hf = CONFIG_MAPPING["paligemma"]()
         vlm_config_hf._vocab_size = 257152  # noqa: SLF001
         vlm_config_hf.image_token_index = 257152
-        vlm_config_hf.text_config.hidden_size = vlm_config.width
-        vlm_config_hf.text_config.intermediate_size = vlm_config.mlp_dim
+        vlm_config_hf.text_config.hidden_size = vlm_config.width   # qkv 的维度
+        vlm_config_hf.text_config.intermediate_size = vlm_config.mlp_dim # FFN 中 up_proj 的 Linear 的输出维度
         vlm_config_hf.text_config.num_attention_heads = vlm_config.num_heads
-        vlm_config_hf.text_config.head_dim = vlm_config.head_dim
+        vlm_config_hf.text_config.head_dim = vlm_config.head_dim   # qkv 的维度除以 num_attention_heads
         vlm_config_hf.text_config.num_hidden_layers = vlm_config.depth
-        vlm_config_hf.text_config.num_key_value_heads = vlm_config.num_kv_heads
+        vlm_config_hf.text_config.num_key_value_heads = vlm_config.num_kv_heads # Grouped Query Attention，K 和 V 被多头的 Q 共享，减少参数量和计算量(降低 KV-CACHE)
         vlm_config_hf.text_config.hidden_activation = "gelu_pytorch_tanh"
         vlm_config_hf.text_config.dtype = "float32"
         vlm_config_hf.text_config.vocab_size = 257152
-        vlm_config_hf.text_config.use_adarms = use_adarms[0]
+        vlm_config_hf.text_config.use_adarms = use_adarms[0]  # Adaptive RMSNorm
         vlm_config_hf.text_config.adarms_cond_dim = vlm_config.width if use_adarms[0] else None
         vlm_config_hf.vision_config.image_size = image_size
         vlm_config_hf.vision_config.intermediate_size = 4304
@@ -289,7 +289,7 @@ class PaliGemmaWithExpertModel(
         out_dtype = image.dtype
         if image.dtype != torch.float32:
             image = image.to(torch.float32)
-        image_outputs = self.paligemma.model.get_image_features(image)
+        image_outputs = self.paligemma.model.get_image_features(image) # ViT + 一个全连接将图像特征转到语言特征空间
         features = image_outputs.pooler_output
         if features.dtype != out_dtype:
             features = features.to(out_dtype)
@@ -503,7 +503,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
 
             embs.append(img_emb)
             pad_masks.append(img_mask[:, None].expand(bsize, num_img_embs))
-            att_masks += [0] * num_img_embs
+            att_masks += [0] * num_img_embs   # 图片变成了一个一个 token 了
 
         # Process language tokens
         def lang_embed_func(lang_tokens):
@@ -517,7 +517,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         num_lang_embs = lang_emb.shape[1]
         att_masks += [0] * num_lang_embs
 
-        embs = torch.cat(embs, dim=1)
+        embs = torch.cat(embs, dim=1)   # 将视觉 token 和 语言 token 拼接在一起
         pad_masks = torch.cat(pad_masks, dim=1)
         att_masks = torch.tensor(att_masks, dtype=torch.bool, device=pad_masks.device)
 
@@ -538,7 +538,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         def state_proj_func(state):
             return self.state_proj(state)
 
-        state_emb = self._apply_checkpoint(state_proj_func, state)
+        state_emb = self._apply_checkpoint(state_proj_func, state)   # 全连接升维
         embs.append(state_emb[:, None, :])
         bsize = state_emb.shape[0]
         device = state_emb.device
@@ -548,7 +548,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         att_masks += [1]
 
         # Embed timestep using sine-cosine positional encoding
-        time_emb = create_sinusoidal_pos_embedding(
+        time_emb = create_sinusoidal_pos_embedding(     # 用正弦函数编码是为了告诉 Expert Gemma："当前去噪进度是多少"，因为 Expert Gemma 是一个自回归模型，它需要知道当前的时间步信息
             timestep,
             self.action_in_proj.out_features,
             min_period=self.config.min_period,
@@ -571,7 +571,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
             x = F.silu(x)
             return self.action_time_mlp_out(x)
 
-        action_time_emb = self._apply_checkpoint(mlp_func, action_time_emb)
+        action_time_emb = self._apply_checkpoint(mlp_func, action_time_emb)  # 将加了时间步信息的动作向量降维到 Expert Gemma 的输入维度
         adarms_cond = None
 
         embs.append(action_time_emb)
@@ -592,9 +592,9 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
     def forward(self, images, img_masks, lang_tokens, lang_masks, state, actions, noise, time) -> Tensor:
         """Do a full training forward pass and compute the loss."""
         time_expanded = time[:, None, None]
-        x_t = time_expanded * noise + (1 - time_expanded) * actions
-        u_t = noise - actions
-
+        x_t = time_expanded * noise + (1 - time_expanded) * actions  # 对动作加噪声
+        u_t = noise - actions                                        # 构建向量场
+        # 编码视觉和语言特征，全部 token 化
         prefix_embs, prefix_pad_masks, prefix_att_masks = self.embed_prefix(
             images, img_masks, lang_tokens, lang_masks
         )
@@ -611,7 +611,10 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         att_masks = torch.cat([prefix_att_masks, suffix_att_masks], dim=1)
 
         att_2d_masks = make_att_2d_masks(pad_masks, att_masks)
-        position_ids = torch.cumsum(pad_masks, dim=1) - 1
+        position_ids = torch.cumsum(pad_masks, dim=1) - 1 # pad_masks:    [1, 1, 0, 0, 1, 1, 1]
+                                                          # cumsum:       [1, 2, 2, 2, 3, 4, 5]
+                                                          # position_ids: [0, 1, 1, 1, 2, 3, 4]
+                                                          # padding 位置和前面共享 position_id
 
         att_2d_masks_4d = prepare_attention_masks_4d(att_2d_masks)
 
@@ -681,7 +684,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
             attention_mask=prefix_att_2d_masks_4d,
             position_ids=prefix_position_ids,
             past_key_values=None,
-            inputs_embeds=[prefix_embs, None],
+            inputs_embeds=[prefix_embs, None],    # 只跑 prefix_embs，suffix_embs 为 None，获取图像和文本 token 的 KV
             use_cache=True,
         )
 
@@ -732,7 +735,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
             attention_mask=full_att_2d_masks_4d,
             position_ids=position_ids,
             past_key_values=past_key_values,
-            inputs_embeds=[None, suffix_embs],
+            inputs_embeds=[None, suffix_embs],  # 只跑 suffix_embs，prefix_embs 为 None，获取动作 token 的 KV
             use_cache=False,
             adarms_cond=[None, adarms_cond],
         )
@@ -1101,12 +1104,12 @@ class PI0Policy(PreTrainedPolicy):
                 - "none": Return per-sample losses of shape (batch_size,) for RA-BC weighting
         """
         # Prepare inputs
-        images, img_masks = self._preprocess_images(batch)
+        images, img_masks = self._preprocess_images(batch)  # resize + 归一化
         lang_tokens, lang_masks = batch[f"{OBS_LANGUAGE_TOKENS}"], batch[f"{OBS_LANGUAGE_ATTENTION_MASK}"]
-        state = self.prepare_state(batch)
-        actions = self.prepare_action(batch)
+        state = self.prepare_state(batch) # 将 dim = 6, pad 到 32
+        actions = self.prepare_action(batch) # 将 dim = 6, pad 到 32
 
-        noise = self.model.sample_noise(actions.shape, actions.device)
+        noise = self.model.sample_noise(actions.shape, actions.device)  # 采样噪声，从标准分布中采样的
         time = self.model.sample_time(actions.shape[0], actions.device)
 
         # Compute loss

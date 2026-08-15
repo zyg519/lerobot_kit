@@ -213,9 +213,9 @@ class LeRobotDataset(torch.utils.data.Dataset):
         super().__init__()
         self.repo_id = repo_id
         self._requested_root = Path(root) if root else None
-        self.delta_timestamps = delta_timestamps
+        self.delta_timestamps = delta_timestamps # 控制 __getitem__ 返回多少个相邻时间步的数据（默认是 50）
         self.tolerance_s = tolerance_s
-        self.revision = revision if revision else CODEBASE_VERSION
+        self.revision = revision if revision else CODEBASE_VERSION # 控制代码版本的
         self._video_backend = video_backend if video_backend else get_safe_default_video_backend()
         self._return_uint8 = return_uint8
         self._depth_output_unit = depth_output_unit
