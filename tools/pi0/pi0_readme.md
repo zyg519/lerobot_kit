@@ -45,3 +45,4 @@ bash tools/pi0/03_dist_train.sh
 ```
 bash tools/pi0/04_rollout.sh
 ```
+[![pi0-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
