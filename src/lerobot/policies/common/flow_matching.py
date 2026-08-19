@@ -96,7 +96,7 @@ def euler_integrate(
     dt = -1.0 / num_steps
     x_t = noise
     for step in range(num_steps):
-        time = 1.0 + step * dt
+        time = 1.0 + step * dt    # 距离终点的时间
         time_tensor = torch.tensor(time, dtype=torch.float32, device=device).expand(bsize)
 
         def denoise_step_partial_call(input_x_t, current_timestep=time_tensor):

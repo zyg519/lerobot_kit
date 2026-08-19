@@ -222,13 +222,13 @@ class DatasetReader:
         query_indices = {
             key: [max(ep_start, min(ep_end - 1, abs_idx + delta)) for delta in delta_idx]
             for key, delta_idx in self.delta_indices.items()
-        }
+        }  # 从 abs_idx 所属的 episode 中提取出连续的 50 步动作
         padding = {
             f"{key}_is_pad": torch.BoolTensor(
                 [(abs_idx + delta < ep_start) | (abs_idx + delta >= ep_end) for delta in delta_idx]
             )
             for key, delta_idx in self.delta_indices.items()
-        }
+        } # 如果提取不到五十步动作，就用 padding 来补齐，padding 的值为 True
         return query_indices, padding
 
     def _get_query_timestamps(
@@ -264,7 +264,7 @@ class DatasetReader:
             try:
                 result[key] = torch.stack(self.hf_dataset[key][relative_indices])
             except (KeyError, TypeError, IndexError):
-                result[key] = torch.stack(self.hf_dataset[relative_indices][key])
+                result[key] = torch.stack(self.hf_dataset[relative_indices][key])  # 提取出动作序列
         return result
 
     def _query_videos(self, query_timestamps: dict[str, list[float]], ep_idx: int) -> dict[str, torch.Tensor]:
@@ -276,9 +276,9 @@ class DatasetReader:
 
         def _decode_single(vid_key: str, query_ts: list[float]) -> tuple[str, torch.Tensor]:
             from_timestamp = ep[f"videos/{vid_key}/from_timestamp"]
-            shifted_query_ts = [from_timestamp + ts for ts in query_ts]
+            shifted_query_ts = [from_timestamp + ts for ts in query_ts]  # 算出当前帧的时间戳在视频中的绝对时间戳
             video_path = self.root / self._meta.get_video_file_path(ep_idx, vid_key)
-            frames = decode_video_frames(
+            frames = decode_video_frames(    # 根据时间戳提取视频帧
                 video_path,
                 shifted_query_ts,
                 self._tolerance_s,
@@ -318,19 +318,19 @@ class DatasetReader:
         """
         item = self.hf_dataset[idx]
         ep_idx = item["episode_index"].item()
-        abs_idx = item["index"].item()
+        abs_idx = item["index"].item()   # 当前动作的绝对 id
 
         query_indices = None
         if self.delta_indices is not None:
-            query_indices, padding = self._get_query_indices(abs_idx, ep_idx)
+            query_indices, padding = self._get_query_indices(abs_idx, ep_idx)  # 提取出一个动作序列的 id
             query_result = self._query_hf_dataset(query_indices)
             item = {**item, **padding}
             for key, val in query_result.items():
-                item[key] = val
+                item[key] = val   # 将 action 替换为一个 50 步的动作序列
 
         if len(self._meta.video_keys) > 0:
             current_ts = item["timestamp"].item()
-            query_timestamps = self._get_query_timestamps(current_ts, query_indices)
+            query_timestamps = self._get_query_timestamps(current_ts, query_indices)  # 取出当前帧的时间戳
             video_frames = self._query_videos(query_timestamps, ep_idx)
             item = {**video_frames, **item}
 

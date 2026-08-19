@@ -185,7 +185,7 @@ class TokenizerProcessorStep(ObservationProcessorStep):
             raise ValueError("Task cannot be None")
 
         # Tokenize the task (this will create CPU tensors)
-        tokenized_prompt = self._tokenize_text(task)
+        tokenized_prompt = self._tokenize_text(task)   # 将字符串转换为 token，但是没有转换为 embedding
 
         # Detect the device from existing tensors in the transition to ensure consistency
         target_device = self._detect_device(self.transition)

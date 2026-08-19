@@ -265,43 +265,46 @@ class RTCInferenceEngine(InferenceEngine):
     def _rtc_loop(self) -> None:
         """Background thread that generates action chunks via RTC."""
         try:
-            latency_tracker = LatencyTracker()
-            time_per_chunk = 1.0 / self._fps
+            latency_tracker = LatencyTracker() # 延迟统计器，维护滑动窗口，统计推理耗时，用来估算`inference_delay`
+            time_per_chunk = 1.0 / self._fps   # 每一个 chunk 对应的理论时间片，例 fps=10 → `time_per_chunk=0.1s`，每一步动作占 0.1 秒物理时间。后续用它把**推理耗时 (秒) 换算成 “多少帧 delay”**
             policy_device = torch.device(self._device)
 
             warmup_required = max(1, self._compile_warmup_inferences) if self._use_torch_compile else 0
-            inference_count = 0
-            consecutive_errors = 0
+            inference_count = 0   # 统计已经完成多少次 RTC 推理
+            consecutive_errors = 0 # 统计连续推理失败次数，超过 `_RTC_MAX_CONSECUTIVE_ERRORS` 就直接抛异常退出线程
 
-            while not self._shutdown_event.is_set():
-                if not self._policy_active.is_set():
+            while not self._shutdown_event.is_set(): # 线程主循环，`_shutdown_event`是线程退出信号；收到 shutdown 事件就退出循环
+                if not self._policy_active.is_set(): # 如果策略被暂停了，就休眠一段时间再继续循环
                     time.sleep(_RTC_IDLE_SLEEP_S)
                     continue
 
-                queue = self._action_queue
+                queue = self._action_queue  # RTC 动作队列，核心对象，存放待执行 action chunk；执行线程从此取动作发给机械臂
                 with self._obs_lock:
-                    obs = self._obs_holder.get("obs")
-                if queue is None or obs is None:
+                    obs = self._obs_holder.get("obs")  # 共享缓冲区，拿到最新一帧机器人观测（图像 + 关节状态）
+                if queue is None or obs is None:     # 队列还没初始化 / 还没有拿到观测，sleep 后跳过，不执行推理
                     time.sleep(_RTC_IDLE_SLEEP_S)
                     continue
 
-                if queue.qsize() <= self._rtc_queue_threshold:
+                if queue.qsize() <= self._rtc_queue_threshold: #队列里面剩余待执行动作数量小于阈值，才跑新的推理生成 chunk；如果队列已经积压很多动作，就不跑推理，避免队列无限膨胀
                     try:
-                        current_time = time.perf_counter()
-                        idx_before = queue.get_action_index()
-                        prev_actions = queue.get_left_over()
-
-                        latency = latency_tracker.max()
-                        delay = math.ceil(latency / time_per_chunk) if latency else 0
-
-                        obs_batch = build_dataset_frame(self._hw_features, obs, prefix="observation")
+                        current_time = time.perf_counter()  # 记录推理开始的高精度时间戳
+                        idx_before = queue.get_action_index() # 获取队列当前末尾动作索引；后面 merge 的时候用来对比，用于计算索引偏移，就是你告警`Indexes diff is not equal to real delay`用到的索引
+                        prev_actions = queue.get_left_over() # 取出上一轮预测 chunk 还**没有执行完的尾部残段 left‑over**
+                                                             # RTC 不是每次从头预测完整 horizon；把上一轮没跑完的动作尾巴拿出来，和新预测拼接，实现流式平滑滚动
+                        latency = latency_tracker.max() 
+                        
+                        delay = math.ceil(latency / time_per_chunk) if latency else 0 # 把推理耗时换算成**多少帧的延迟步数**
+                                                                                      # 这个`delay`就是传给 policy 的`inference_delay`，告诉模型：从观测采集到动作输出已经滞后多少 step
+                        print(f"RTC inference delay: {delay}")
+                        obs_batch = build_dataset_frame(self._hw_features, obs, prefix="observation") # 把硬件原始观测（图像、关节）组装成和训练数据集格式一致的一帧数据
                         obs_batch = prepare_observation_for_inference(
                             obs_batch, policy_device, self._task, self._robot.robot_type
                         )
                         obs_batch["task"] = [self._task]
 
-                        preprocessed = self._preprocessor(obs_batch)
+                        preprocessed = self._preprocessor(obs_batch)  # 运行预处理器：归一化、图像变换等，和训练时的 preprocessor 保持一致
 
+                        # 上一轮残段动作是基于上一帧的相对坐标系；现在机器人关节已经变化，需要**重新锚定 (reanchor)**，把旧的残段动作转换到当前机器人坐标系下，保证动作不会跳变
                         if prev_actions is not None and self._relative_step is not None:
                             # Rebase against the raw cached state so the leftover tail stays in
                             # the training-time coordinate frame.
@@ -322,6 +325,7 @@ class RTCInferenceEngine(InferenceEngine):
                                 prev_actions, target_steps=self._rtc_config.execution_horizon
                             )
 
+                        print(f"RTC inference before `predict_action_chunk`: queue size: {queue.qsize()}")
                         actions = self._policy.predict_action_chunk(
                             preprocessed, inference_delay=delay, prev_chunk_left_over=prev_actions
                         )
@@ -330,6 +334,8 @@ class RTCInferenceEngine(InferenceEngine):
                         processed = self._postprocessor(actions).squeeze(0)
                         new_latency = time.perf_counter() - current_time
                         new_delay = math.ceil(new_latency / time_per_chunk)
+                        # print(f"RTC inference after `predict_action_chunk`: queue size: {queue.qsize()}")
+                        # print(f"RTC inference latency: {new_latency:.2f}s, queue size: {queue.qsize()}")
 
                         inference_count += 1
                         consecutive_errors = 0

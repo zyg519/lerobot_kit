@@ -72,7 +72,7 @@ class Pi0NewLineProcessor(ComplementaryDataProcessorStep):
                 new_complementary_data["task"] = f"{task}\n"
         elif isinstance(task, list) and all(isinstance(t, str) for t in task):
             # List of strings: add newline to each if not present
-            new_complementary_data["task"] = [t if t.endswith("\n") else f"{t}\n" for t in task]
+            new_complementary_data["task"] = [t if t.endswith("\n") else f"{t}\n" for t in task] # 加上换行符
         # If task is neither string nor list of strings, leave unchanged
 
         return new_complementary_data

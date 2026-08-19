@@ -80,7 +80,7 @@ def compute_layer_complete(inputs_embeds, attention_mask, position_ids, adarms_c
     key_states = []
     value_states = []
     gates = []
-    for i, hidden_states in enumerate(inputs_embeds):
+    for i, hidden_states in enumerate(inputs_embeds):  # inputs_embeds 有两个，一个是 VLM 的输入，一个是 action_expert 的输入
         layer = layers[i]
         hidden_states, gate = layernorm_forward(layer.input_layernorm, hidden_states, adarms_cond[i])
         gates.append(gate)
@@ -93,7 +93,7 @@ def compute_layer_complete(inputs_embeds, attention_mask, position_ids, adarms_c
         key_states.append(key_state)
         value_states.append(value_state)
     # Concatenate and process attention
-    query_states = torch.cat(query_states, dim=2)
+    query_states = torch.cat(query_states, dim=2)  # 将 VLM 和 action_expert 的 query，key， v  拼接在一起，作为 attention 的 query，key， v
     key_states = torch.cat(key_states, dim=2)
     value_states = torch.cat(value_states, dim=2)
     dummy_tensor = torch.zeros(
@@ -110,7 +110,7 @@ def compute_layer_complete(inputs_embeds, attention_mask, position_ids, adarms_c
     batch_size = query_states.shape[0]
     paligemma_layer = layers[0]
     scaling = paligemma_layer.self_attn.scaling
-    # Attention computation
+    # Attention computation，VLM 和 expert 的特征之间做 attention
     att_output, _ = modeling_gemma.eager_attention_forward(
         paligemma_layer.self_attn,
         query_states,
@@ -125,7 +125,7 @@ def compute_layer_complete(inputs_embeds, attention_mask, position_ids, adarms_c
     # Process layer outputs
     outputs_embeds = []
     start_pos = 0
-    for i, hidden_states in enumerate(inputs_embeds):
+    for i, hidden_states in enumerate(inputs_embeds):   # 利用融合的特征 outputs_embeds 分别计算出 VLM 和 expert 的特征
         layer = layers[i]
         end_pos = start_pos + hidden_states.shape[1]
         if att_output.dtype != layer.self_attn.o_proj.weight.dtype:
@@ -515,11 +515,11 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         pad_masks.append(lang_masks)
 
         num_lang_embs = lang_emb.shape[1]
-        att_masks += [0] * num_lang_embs
+        att_masks += [0] * num_lang_embs   # 图像token 和 语言 token 都是 0，表示它们可以互相注意
 
         embs = torch.cat(embs, dim=1)   # 将视觉 token 和 语言 token 拼接在一起
         pad_masks = torch.cat(pad_masks, dim=1)
-        att_masks = torch.tensor(att_masks, dtype=torch.bool, device=pad_masks.device)
+        att_masks = torch.tensor(att_masks, dtype=torch.bool, device=pad_masks.device) # 
 
         bsize = pad_masks.shape[0]
         att_masks = att_masks[None, :].expand(bsize, len(att_masks))
@@ -564,7 +564,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         action_emb = self._apply_checkpoint(action_proj_func, noisy_actions)
 
         time_emb = time_emb[:, None, :].expand_as(action_emb)
-        action_time_emb = torch.cat([action_emb, time_emb], dim=2)
+        action_time_emb = torch.cat([action_emb, time_emb], dim=2)  # 将 action 和 时间信息融合
 
         def mlp_func(action_time_emb):
             x = self.action_time_mlp_in(action_time_emb)
@@ -580,8 +580,8 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         pad_masks.append(action_time_mask)
 
         # Set attention masks so that image, language and state inputs do not attend to action tokens
-        att_masks += [1] + ([0] * (self.config.chunk_size - 1))
-
+        att_masks += [1] + ([0] * (self.config.chunk_size - 1)) # 这里的 [1] 是为了将 action token 放到一个独立的 block 中，防止它们和图像、语言、状态 token 互相注意
+                                                                # state 和 action 不是一个 block，action 只能注意到自己和前面的 action token
         embs = torch.cat(embs, dim=1)
         pad_masks = torch.cat(pad_masks, dim=1)
         att_masks = torch.tensor(att_masks, dtype=embs.dtype, device=embs.device)
@@ -594,11 +594,11 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
         time_expanded = time[:, None, None]
         x_t = time_expanded * noise + (1 - time_expanded) * actions  # 对动作加噪声
         u_t = noise - actions                                        # 构建向量场
-        # 编码视觉和语言特征，全部 token 化
+        # 编码视觉和语言特征，全部 token 化, prefix_att_masks 全是 False，图像和语言 token 之间可以互相注意
         prefix_embs, prefix_pad_masks, prefix_att_masks = self.embed_prefix(
             images, img_masks, lang_tokens, lang_masks
         )
-        suffix_embs, suffix_pad_masks, suffix_att_masks, adarms_cond = self.embed_suffix(state, x_t, time)
+        suffix_embs, suffix_pad_masks, suffix_att_masks, adarms_cond = self.embed_suffix(state, x_t, time) # 加入 x_t 是因为去噪时，噪声动作也是输入
 
         if (
             self.paligemma_with_expert.paligemma.model.language_model.layers[0].self_attn.q_proj.weight.dtype
@@ -608,15 +608,15 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
             prefix_embs = prefix_embs.to(dtype=torch.bfloat16)
 
         pad_masks = torch.cat([prefix_pad_masks, suffix_pad_masks], dim=1)
-        att_masks = torch.cat([prefix_att_masks, suffix_att_masks], dim=1)
+        att_masks = torch.cat([prefix_att_masks, suffix_att_masks], dim=1)  # 用来生成 2D attention mask 的 mask
 
-        att_2d_masks = make_att_2d_masks(pad_masks, att_masks)
+        att_2d_masks = make_att_2d_masks(pad_masks, att_masks)   # 生成 2D attention mask，决定每个 token 可以看到哪些 token 的 mask
         position_ids = torch.cumsum(pad_masks, dim=1) - 1 # pad_masks:    [1, 1, 0, 0, 1, 1, 1]
                                                           # cumsum:       [1, 2, 2, 2, 3, 4, 5]
                                                           # position_ids: [0, 1, 1, 1, 2, 3, 4]
                                                           # padding 位置和前面共享 position_id
 
-        att_2d_masks_4d = prepare_attention_masks_4d(att_2d_masks)
+        att_2d_masks_4d = prepare_attention_masks_4d(att_2d_masks)  # 转 4d 一方面是为了可以广播到多个 head，另方面是将不可视token的mask值转换为超大负值
 
         def forward_func(prefix_embs, suffix_embs, att_2d_masks_4d, position_ids, adarms_cond):
             (_, suffix_out), _ = self.paligemma_with_expert.forward(
@@ -627,7 +627,7 @@ class PI0Pytorch(nn.Module):  # see openpi `PI0Pytorch`
                 use_cache=False,
                 adarms_cond=[None, adarms_cond],
             )
-            return suffix_out
+            return suffix_out  # 因为 VLM 和 action expert 是逐层交互的，每次都输出两个部分，所以这里返回最后一次交互后 action expert 的输出作为结果
 
         suffix_out = self._apply_checkpoint(
             forward_func, prefix_embs, suffix_embs, att_2d_masks_4d, position_ids, adarms_cond
@@ -1104,7 +1104,7 @@ class PI0Policy(PreTrainedPolicy):
                 - "none": Return per-sample losses of shape (batch_size,) for RA-BC weighting
         """
         # Prepare inputs
-        images, img_masks = self._preprocess_images(batch)  # resize + 归一化
+        images, img_masks = self._preprocess_images(batch)  # resize + 归一化到 (-1, 1)
         lang_tokens, lang_masks = batch[f"{OBS_LANGUAGE_TOKENS}"], batch[f"{OBS_LANGUAGE_ATTENTION_MASK}"]
         state = self.prepare_state(batch) # 将 dim = 6, pad 到 32
         actions = self.prepare_action(batch) # 将 dim = 6, pad 到 32
@@ -1135,12 +1135,17 @@ class PI0Policy(PreTrainedPolicy):
             return loss, loss_dict
 
     def _get_default_peft_targets(self) -> dict[str, any]:
-        """Return default PEFT target modules for PI0 fine-tuning."""
-        common_projections = (
-            "state_proj|action_in_proj|action_out_proj|action_time_mlp_in|action_time_mlp_out"
-        )
-        target_modules = rf"(.*\.gemma_expert\..*\.self_attn\.(q|v)_proj|model\.({common_projections}))"
+        """Return default PEFT target modules for PI0 fine-tuning.
+
+        Covers every linear layer across the three sub-networks:
+        - vision encoder (SigLIP)
+        - VLM language model (PaliGemma)
+        - action expert (Gemma expert)
+        plus the state/action projection heads. `all-linear` lets PEFT match all
+        `nn.Linear` modules regardless of naming conventions (Gemma uses
+        `q/k/v/o_proj` and `gate/up/down_proj`; SigLIP uses `out_proj` and `fc1/fc2`).
+        """
         return {
-            "target_modules": target_modules,
+            "target_modules": "all-linear",
             "modules_to_save": [],
         }
