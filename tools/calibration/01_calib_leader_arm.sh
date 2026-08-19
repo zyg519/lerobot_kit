@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ============================================================
-# LeRobot 清除 leading idle frames
+# LeRobot 校准主臂
 # ============================================================
 
 # 激活 .venv 环境
@@ -19,16 +19,12 @@ WORKSPACE_FOLDER="$(cd "$(dirname $(dirname $(dirname "${BASH_SOURCE[0]}")))" &&
 cd "${WORKSPACE_FOLDER}" || exit 1
 
 # --- 入口脚本 ---
-SCRIPT="${WORKSPACE_FOLDER}/src/lerobot/scripts/lerobot_trim.py"
+SCRIPT="${WORKSPACE_FOLDER}/src/lerobot/scripts/lerobot_calibrate.py"
 
-
-# if you  want to trim dataset directly, uncomment the following code
+# ============================================================
+# 执行
+# ============================================================
 python "${SCRIPT}" \
-    "D:/worksp/data/grap_ball_20260815_175420" \
-    --output="D:/worksp/data/grap_ball_20260815_17542_test"
-
-# if you want to test script，uncomment the following code
-# python "${SCRIPT}" \
-#     "D:/worksp/data/grap_ball_20260815_175420" \
-#     --output="D:/worksp/data/grap_ball_20260815_17542_test" \
-#     --dry-run
+    --teleop.type="so101_leader" \
+    --teleop.port="COM22" \
+    --teleop.id="leader_arm"

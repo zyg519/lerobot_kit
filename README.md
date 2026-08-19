@@ -46,12 +46,58 @@
 |||
 
 ## 安装环境
-使用 conda 或者 uv 配置环境都可以，二者选一, 不建议使用 wsl，推荐纯 windows 环境或者纯 Linux 环境。笔者的远程服务器是 ubuntu22.04，本地设备因为要玩游戏所以是 windows。
+使用 conda 或者 uv 配置环境都可以，二者选一, 不建议使用 wsl，推荐纯 windows 环境或者纯 Linux 环境。笔者的远程服务器是 ubuntu22.04，本地设备因为要玩游戏所以是 windows。环境的详细安装步骤参考下述链接：
+> https://huggingface.co/docs/lerobot/installation
+
 ### conda 
 ```
 conda create -y -n lerobot python=3.12
 conda activate lerobot
 
-git clone 
+git clone https://github.com/zyg519/lerobot_kit.git
+cd lerobot_kit
+pip install -e ".[all]"           # Everything (all policies, envs, hardware, dev tools)
 ```
+
+### uv
+```
+git clone https://github.com/zyg519/lerobot_kit.git
+cd lerobot_kit 
+
+uv python install 3.12
+uv venv --python 3.12
+
+# Linux/macOS
+source .venv/bin/activate
+# Windows PowerShell
+.venv\Scripts\activate
+
+uv pip install -e ".[all]"           # Everything (all policies, envs, hardware, dev tools)
+```
+
+## 机械臂校准
+校准之前需要将机械臂通过 usb 数据线连接至电脑，查询机器臂在设备上的 port 号，然后将脚本中的 port 号替换为实际的 port 号，格式如下：
+
+```
+# Windows
+COM22
+
+# Linux
+/dev/ttyACM0
+```
+
+校准 SO101-Leader ARM
+```
+bash tools/calibration/01_calib_leader_arm.sh
+```
+校准过程中如果出现关节角度不在合理范围的报错，需要关闭校准，将关节掰到合适角度后再开始校准。<br>
+
+校准 SO101-Follower ARM
+```
+bash tools/calibration/02_calib_follower_arm.sh
+```
+
+## PEFT of VLA Algorithms
+
+- [Pi0微调步骤](/tools/pi0/pi0_readme.md)
 

@@ -7,6 +7,9 @@
 # 激活 .venv 环境
 source .venv/bin/activate
 
+# 或者激活 conda 环境
+# conda activate lerobot
+
 # 更新 Python 的模块搜索环境变量
 export PYTHONPATH="${PWD}:${PYTHONPATH}"
 export HF_ENDPOINT="https://hf-mirror.com"
