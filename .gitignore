@@ -89,7 +89,7 @@ celerybeat.pid
 
 ### IDE & Editor Config ###
 # VS Code
-.vscode/
+# .vscode/
 .devcontainer/
 
 # JetBrains / PyCharm
