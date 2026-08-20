@@ -5,8 +5,9 @@
 
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Lerobot-0.6.2-2ea45f" alt="Lerobot-verison"></a>
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Pi0-=white" alt="Manifest V3"></a>
+  <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/ACT-=white" alt="Manifest V3"></a>
   <br>
-  <a href="README_EN.md">English</a>
+  <!-- <a href="README_EN.md">English</a> -->
 </div>
 
 ## 硬件需求
@@ -42,7 +43,7 @@
 |---|--|
 |CPU| Intel i914900kf |
 |RAM| 32 G |
-|GPU| 1 x 4080ti@16G
+|GPU| 1 x 4080Ti@16G
 |||
 
 ## 安装环境
@@ -76,7 +77,7 @@ uv pip install -e ".[all]"           # Everything (all policies, envs, hardware,
 ```
 
 ## 机械臂校准
-校准之前需要将机械臂通过 usb 数据线连接至电脑，查询机器臂在设备上的 port 号，然后将脚本中的 port 号替换为实际的 port 号，格式如下：
+校准之前需要将机械臂通过 usb 数据线连接至电脑，查询机器臂在设备上的 port 号，然后将脚本中的 port 号替换为实际的 port 号，Windows 和 Linux 下格式风格如下例所示：
 
 ```
 # Windows
@@ -127,5 +128,6 @@ bash tools/calibration/02_calib_follower_arm.sh
 ```
 
 ## PEFT of VLA Algorithms
-
-- [Pi0微调步骤](/tools/pi0/pi0_readme.md)
+- [Pi0: A Vision-Language-Action Flow Model for General Robot Control](/tools/pi0/pi0_readme.md)
+- [ACT: Learning Fine-Grained Bimanual Manipulation with
+Low-Cost Hardware](/tools/act/act_readme.md)

@@ -14,7 +14,7 @@ source .venv/bin/activate
 export PYTHONPATH="${PWD}:${PYTHONPATH}"
 export HF_ENDPOINT="https://hf-mirror.com"
 
-OUTPUT_DIR="./outputs/act_training_20260819_1"
+OUTPUT_DIR="./outputs/act_training_20260820_test"
 LOG_DIR="${OUTPUT_DIR}_log"
 mkdir -p "${LOG_DIR}"
 
@@ -23,15 +23,15 @@ torchrun \
     src/lerobot/scripts/lerobot_train.py \
     --policy.type="act" \
     --policy.push_to_hub=false \
-    --policy.chunk_size=50 \
-    --policy.n_action_steps=50 \
+    --policy.chunk_size=100 \
+    --policy.n_action_steps=100 \
     --dataset.repo_id="" \
     --dataset.root="/data/chenzhen/tmp/lerobot/data/grap_ball_20260815_175420_trim" \
     --job_name="act_training" \
     --output_dir="${OUTPUT_DIR}" \
-    --steps=30000 \
+    --steps=60000 \
     --batch_size=4 \
     --num_workers=8 \
     --wandb.enable=false \
     --save_checkpoint=true \
-2>&1 | tee "${LOG_DIR}/train.log"
+2>&1 | tee >(awk '/loss/ {print}' >> "${LOG_DIR}/train.log")
