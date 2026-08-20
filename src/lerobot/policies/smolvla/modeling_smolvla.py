@@ -582,7 +582,7 @@ class VLAFlowMatching(nn.Module):
 
             # Normalize image embeddings
             img_emb_dim = img_emb.shape[-1]
-            img_emb = img_emb * torch.tensor(img_emb_dim**0.5, dtype=img_emb.dtype, device=img_emb.device)
+            img_emb = img_emb * torch.tensor(img_emb_dim**0.5, dtype=img_emb.dtype, device=img_emb.device) # 对齐图像 embedding 与文本 embedding 的数值量级，同时和位置编码幅值匹配，防止某一类信号被淹
 
             bsize, num_img_embs = img_emb.shape[:2]
             img_mask = img_mask[:, None].expand(bsize, num_img_embs)
@@ -608,7 +608,7 @@ class VLAFlowMatching(nn.Module):
         lang_emb = self.vlm_with_expert.embed_language_tokens(lang_tokens)
         # Normalize language embeddings
         lang_emb_dim = lang_emb.shape[-1]
-        lang_emb = lang_emb * math.sqrt(lang_emb_dim)
+        lang_emb = lang_emb * math.sqrt(lang_emb_dim) # embedding 先放大，配合注意力内部的缩小，**使得点积的方差维持在 1 附近，避免 softmax 饱和、梯度消失，训练更稳**
 
         embs.append(lang_emb)
         pad_masks.append(lang_masks)
@@ -616,7 +616,7 @@ class VLAFlowMatching(nn.Module):
         num_lang_embs = lang_emb.shape[1]
         att_masks += [0] * num_lang_embs
 
-        state_emb = self.state_proj(state)
+        state_emb = self.state_proj(state)   # 编码 state
         state_emb = state_emb[:, None, :] if state_emb.ndim == 2 else state_emb
         embs.append(state_emb)
         bsize = state_emb.shape[0]

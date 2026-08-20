@@ -305,7 +305,7 @@ class SmolVLMWithExpertModel(nn.Module):
         assert len(inputs_embeds) == 2 or (use_cache and past_key_values is not None), (
             f"Both len(inputs_embeds) == {len(inputs_embeds)} and past_key_values is {past_key_values}"
         )
-
+        # VLM layer 输出 K 和 V，expert layer 输出 Q，然后做 attention
         if len(inputs_embeds) == 2 and not past_key_values:
             # Prefix attention
             seq_len = inputs_embeds[0].shape[1]
