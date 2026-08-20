@@ -97,7 +97,35 @@ bash tools/calibration/01_calib_leader_arm.sh
 bash tools/calibration/02_calib_follower_arm.sh
 ```
 
+## launch.json 配置（调试用模板）
+```
+# train
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/lerobot/scripts/lerobot_xxxx.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "python": "${workspaceFolder}/.venv/bin/python",
+            "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}", "HF_ENDPOINT": "https://hf-mirror.com"},
+            "args": [
+               ...
+            ]
+ 
+        }
+    ]
+}
+```
+
 ## PEFT of VLA Algorithms
 
 - [Pi0微调步骤](/tools/pi0/pi0_readme.md)
-

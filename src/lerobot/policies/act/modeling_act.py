@@ -410,12 +410,12 @@ class ACT(nn.Module):
                 self.vae_encoder_cls_embed.weight, "1 d -> b 1 d", b=batch_size
             )  # (B, 1, D)
             if self.config.robot_state_feature:
-                robot_state_embed = self.vae_encoder_robot_state_input_proj(batch[OBS_STATE])
+                robot_state_embed = self.vae_encoder_robot_state_input_proj(batch[OBS_STATE])   # encode obs_state
                 robot_state_embed = robot_state_embed.unsqueeze(1)  # (B, 1, D)
-            action_embed = self.vae_encoder_action_input_proj(batch[ACTION])  # (B, S, D)
+            action_embed = self.vae_encoder_action_input_proj(batch[ACTION])  # (B, S, D)，encode action
 
             if self.config.robot_state_feature:
-                vae_encoder_input = [cls_embed, robot_state_embed, action_embed]  # (B, S+2, D)
+                vae_encoder_input = [cls_embed, robot_state_embed, action_embed]  # (B, S+2, D)， cls_embed 被用来从 action 和 state 中提取信息
             else:
                 vae_encoder_input = [cls_embed, action_embed]
             vae_encoder_input = torch.cat(vae_encoder_input, axis=1)
@@ -442,13 +442,13 @@ class ACT(nn.Module):
                 pos_embed=pos_embed.permute(1, 0, 2),
                 key_padding_mask=key_padding_mask,
             )[0]  # select the class token, with shape (B, D)
-            latent_pdf_params = self.vae_encoder_latent_output_proj(cls_token_out)
-            mu = latent_pdf_params[:, : self.config.latent_dim]
+            latent_pdf_params = self.vae_encoder_latent_output_proj(cls_token_out)       # 映射到 latent space
+            mu = latent_pdf_params[:, : self.config.latent_dim]                          # 均值
             # This is 2log(sigma). Done this way to match the original implementation.
-            log_sigma_x2 = latent_pdf_params[:, self.config.latent_dim :]
+            log_sigma_x2 = latent_pdf_params[:, self.config.latent_dim :]                # 方差
 
             # Sample the latent with the reparameterization trick.
-            latent_sample = mu + log_sigma_x2.div(2).exp() * torch.randn_like(mu)
+            latent_sample = mu + log_sigma_x2.div(2).exp() * torch.randn_like(mu)        # 重参数化技巧，防止梯度断流
         else:
             # When not using the VAE encoder, we set the latent to be all zeros.
             mu = log_sigma_x2 = None
