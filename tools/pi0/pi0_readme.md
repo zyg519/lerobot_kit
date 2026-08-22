@@ -46,5 +46,15 @@ bash tools/pi0/03_dist_train.sh
 bash tools/pi0/04_rollout.sh
 ```
 
+## 05 远程服务器和本地联动 rollout
+在脚本 `05_romote_rollout_server.sh` 配置好端口号, fps，inference_latency, 在远程服务器上执行下述脚本启动 policy_server:
+```
+bash tools/pi0/05_romote_rollout_server.sh
+```
+在脚本 `06_remote_rollout_client.sh` 配置好相关参数，在本地主机上执行下述脚本启动 client
+```
+bash tools/pi0/06_remote_rollout_client.sh
+```
+
 [![pi0-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
