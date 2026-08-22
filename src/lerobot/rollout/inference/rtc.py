@@ -295,7 +295,7 @@ class RTCInferenceEngine(InferenceEngine):
                         
                         delay = math.ceil(latency / time_per_chunk) if latency else 0 # 把推理耗时换算成**多少帧的延迟步数**
                                                                                       # 这个`delay`就是传给 policy 的`inference_delay`，告诉模型：从观测采集到动作输出已经滞后多少 step
-                        print(f"RTC inference delay: {delay}")
+                        # print(f"RTC inference delay: {delay}")
                         obs_batch = build_dataset_frame(self._hw_features, obs, prefix="observation") # 把硬件原始观测（图像、关节）组装成和训练数据集格式一致的一帧数据
                         obs_batch = prepare_observation_for_inference(
                             obs_batch, policy_device, self._task, self._robot.robot_type
@@ -325,10 +325,12 @@ class RTCInferenceEngine(InferenceEngine):
                                 prev_actions, target_steps=self._rtc_config.execution_horizon
                             )
 
-                        print(f"RTC inference before `predict_action_chunk`: queue size: {queue.qsize()}")
+                        policy_infer_st = time.perf_counter()
                         actions = self._policy.predict_action_chunk(
                             preprocessed, inference_delay=delay, prev_chunk_left_over=prev_actions
                         )
+                        policy_infer_dua = time.perf_counter() - policy_infer_st
+                        print(f"RTC inference latency: {policy_infer_dua:.2f}s")
 
                         original = actions.squeeze(0).clone()
                         processed = self._postprocessor(actions).squeeze(0)

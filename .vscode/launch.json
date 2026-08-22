@@ -194,6 +194,44 @@
 //     ]
 // }
 
+// ----------------------------------------------------------------------------------------------------------
+
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            // "program": "${workspaceFolder}/src/lerobot/async_inference/robot_client.py",
+            "module": "lerobot.async_inference.robot_client",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
+            "args": [
+                "--policy_type", "pi0",
+                "--pretrained_name_or_path", "/data/chenzhen/tmp/lerobot/outputs/pi0_training_20260817_1/checkpoints/030000/merged_model",
+                "--robot.type", "so101_follower",
+                "--robot.port", "COM24",
+                "--robot.id", "follower_arm",
+                "--robot.cameras", "{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}, handeye: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}}",
+                "--actions_per_chunk", "50",
+                "--task", "Grab the ball",
+                "--policy_device", "cuda",
+                "--client_device", "cpu",
+                "--chunk_size_threshold", "0.5",
+                "--aggregate_fn_name", "weighted_average",
+                "--server_address", "127.0.0.1:2333",
+                "--fps", "20"
+            ]
+        }
+    ]
+}
+
 
 // ===========================================================================
 // VLA-ACT
@@ -279,50 +317,50 @@
 // VLA-SmolVLA
 // ===========================================================================
 
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+// {
+//     // Use IntelliSense to learn about possible attributes.
+//     // Hover to view descriptions of existing attributes.
+//     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+//     "version": "0.2.0",
+//     "configurations": [
 
-        {
-            "name": "Python Debugger: Current File",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/lerobot/scripts/lerobot_train.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false,
-            "python": "${workspaceFolder}/.venv/bin/python",
-            "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}", "HF_ENDPOINT": "https://hf-mirror.com"},
-            "args": [
-                "--policy.type", "smolvla",                                  // 加载huggingface上lerobot/pi0预定义策略配置（pi0）
-                "--policy.pretrained_path", "/home/zyg/.cache/modelscope/models/lerobot--smolvla_base/snapshots/master",
-                "--policy.push_to_hub", "false",
-                "--policy.compile_model", "false",
-                "--policy.freeze_vision_encoder", "false",
-                "--policy.train_expert_only", "false",
-                "--dataset.repo_id", "",         // 数据集id, 会自动去 huggingface 数据集本地缓存目录（~/.cache/huggingface/datasets/）
-                "--dataset.root", "/data/chenzhen/tmp/lerobot/data/grap_ball_20260815_175420_trim",           // 本地数据集磁盘根目录（data meta videos所在文件夹）
-                "--job_name", "smolvla_training",
-                "--output_dir", "./outputs/smolvla_training_test",
-                // "--peft.method_type", "LORA",                          // lora微调
-                // "--peft.target_modules", "all-linear",
-                // "--peft.r", "8",                                 // lora rank
-                // "--peft.lora_alpha", "16",                               // lora alpha
-                "--steps", "30000",                               // 训练迭代步数，冒烟测试只跑100步
-                "--batch_size", "8",                            // batch大小
-                "--num_workers", "0",                           // 调试用！关闭dataloader子进程，断点才能命中；正式训练去掉
-                "--wandb.enable", "false",                      // 关闭wandb日志，不用登录wandb账号
-                "--save_checkpoint", "true",                    // 冒烟测试不保存checkpoint，节省磁盘
-                // "--dataset.eval_split", "0.2",                  // 每个 task 最后 20% 的 episode 作为验证集
-                // "--eval_steps", "10000",    
-            ]
+//         {
+//             "name": "Python Debugger: Current File",
+//             "type": "debugpy",
+//             "request": "launch",
+//             "program": "${workspaceFolder}/src/lerobot/scripts/lerobot_train.py",
+//             "console": "integratedTerminal",
+//             "cwd": "${workspaceFolder}",
+//             "justMyCode": false,
+//             "python": "${workspaceFolder}/.venv/bin/python",
+//             "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}", "HF_ENDPOINT": "https://hf-mirror.com"},
+//             "args": [
+//                 "--policy.type", "smolvla",                                  // 加载huggingface上lerobot/pi0预定义策略配置（pi0）
+//                 "--policy.pretrained_path", "/home/zyg/.cache/modelscope/models/lerobot--smolvla_base/snapshots/master",
+//                 "--policy.push_to_hub", "false",
+//                 "--policy.compile_model", "false",
+//                 "--policy.freeze_vision_encoder", "false",
+//                 "--policy.train_expert_only", "false",
+//                 "--dataset.repo_id", "",         // 数据集id, 会自动去 huggingface 数据集本地缓存目录（~/.cache/huggingface/datasets/）
+//                 "--dataset.root", "/data/chenzhen/tmp/lerobot/data/grap_ball_20260815_175420_trim",           // 本地数据集磁盘根目录（data meta videos所在文件夹）
+//                 "--job_name", "smolvla_training",
+//                 "--output_dir", "./outputs/smolvla_training_test",
+//                 // "--peft.method_type", "LORA",                          // lora微调
+//                 // "--peft.target_modules", "all-linear",
+//                 // "--peft.r", "8",                                 // lora rank
+//                 // "--peft.lora_alpha", "16",                               // lora alpha
+//                 "--steps", "30000",                               // 训练迭代步数，冒烟测试只跑100步
+//                 "--batch_size", "8",                            // batch大小
+//                 "--num_workers", "0",                           // 调试用！关闭dataloader子进程，断点才能命中；正式训练去掉
+//                 "--wandb.enable", "false",                      // 关闭wandb日志，不用登录wandb账号
+//                 "--save_checkpoint", "true",                    // 冒烟测试不保存checkpoint，节省磁盘
+//                 // "--dataset.eval_split", "0.2",                  // 每个 task 最后 20% 的 episode 作为验证集
+//                 // "--eval_steps", "10000",    
+//             ]
  
-        }
-    ]
-}
+//         }
+//     ]
+// }
 
 // ----------------------------------------------------------------------------------------------------------
 
@@ -343,12 +381,11 @@
 //             // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
 //             "args": [
 //                 "--strategy.type", "base",
-//                 "--policy.path", "D:\\worksp\\projects\\lerobot\\outputs\\pi0_training_20260817_1\\checkpoints\\030000\\pretrained_model",
-//                 "--policy.dtype", "bfloat16",
+//                 "--policy.path", "D:\\worksp\\projects\\lerobot_kit\\outputs\\smolvla_training_20260821_3\\pretrained_model",
 //                 // "--inference.type", "sync",
 //                 "--inference.type", "rtc",
 //                 "--inference.rtc.execution_horizon", "20",   // 要大于等于实际的 inference_delay 数, 小于等于 total_step - inference_delay
-//                 "--inference.rtc.max_guidance_weight", "6",
+//                 "--inference.rtc.max_guidance_weight", "5",
 //                 "--robot.type", "so101_follower",
 //                 "--robot.port", "COM24",
 //                 "--robot.id", "follower_arm",
@@ -356,7 +393,7 @@
 //                 "--task", "Grab the ball",
 //                 "--device", "cuda",
 //                 "--duration", "1000",
-//                 "--fps", "10",
+//                 "--fps", "30",
 //                 // "--display_data", "true",
 //                 // "--display_mode", "rerun"
 //             ]
