@@ -2,6 +2,7 @@
 """Merge a LeRobot PEFT adapter into its base policy."""
 
 import argparse
+import json
 import shutil
 from pathlib import Path
 
@@ -72,6 +73,17 @@ def main() -> None:
     merged_policy = peft_policy.merge_and_unload()
     output_path.mkdir(parents=True, exist_ok=True)
     merged_policy.save_pretrained(output_path)
+
+    # save_pretrained() writes the base policy config. Restore the adapter's
+    # feature metadata so camera and state keys remain those used in training.
+    adapter_config_file = adapter_path / "config.json"
+    if adapter_config_file.is_file():
+        with adapter_config_file.open() as file:
+            policy_config = json.load(file)
+        policy_config["use_peft"] = False
+        policy_config["pretrained_path"] = None
+        with (output_path / "config.json").open("w") as file:
+            json.dump(policy_config, file, indent=2)
 
     for source in adapter_path.glob("policy_*"):
         if source.is_file():

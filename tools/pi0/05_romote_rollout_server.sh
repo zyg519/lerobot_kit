@@ -14,6 +14,6 @@ source .venv/bin/activate
 python -m lerobot.async_inference.policy_server \
 --host=127.0.0.1 \
 --port=2333 \
---fps=10 \
---inference_latency=0.1 \
+--fps=20 \
+--inference_latency=0.05 \
 --obs_queue_timeout=1
