@@ -6,6 +6,7 @@
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Lerobot-0.6.2-2ea45f" alt="Lerobot-verison"></a>
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Pi0-=white" alt="Manifest V3"></a>
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/ACT-=white" alt="Manifest V3"></a>
+  <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/SmolVLA-=white" alt="Manifest V3"></a>
   <br>
   <!-- <a href="README_EN.md">English</a> -->
 </div>
@@ -131,3 +132,5 @@ bash tools/calibration/02_calib_follower_arm.sh
 - [Pi0: A Vision-Language-Action Flow Model for General Robot Control](/tools/pi0/pi0_readme.md)
 - [ACT: Learning Fine-Grained Bimanual Manipulation with
 Low-Cost Hardware](/tools/act/act_readme.md)
+- [SmolVLA: A vision-language-action model
+for affordable and efficient robotics](/tools/smolvla/smolvla_readme.md)

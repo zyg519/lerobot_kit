@@ -196,41 +196,41 @@
 
 // ----------------------------------------------------------------------------------------------------------
 
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python Debugger: Current File",
-            "type": "debugpy",
-            "request": "launch",
-            // "program": "${workspaceFolder}/src/lerobot/async_inference/robot_client.py",
-            "module": "lerobot.async_inference.robot_client",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false,
-            // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
-            "args": [
-                "--policy_type", "pi0",
-                "--pretrained_name_or_path", "/data/chenzhen/tmp/lerobot/outputs/pi0_training_20260817_1/checkpoints/030000/merged_model",
-                "--robot.type", "so101_follower",
-                "--robot.port", "COM24",
-                "--robot.id", "follower_arm",
-                "--robot.cameras", "{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}, handeye: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}}",
-                "--actions_per_chunk", "50",
-                "--task", "Grab the ball",
-                "--policy_device", "cuda",
-                "--client_device", "cpu",
-                "--chunk_size_threshold", "0.5",
-                "--aggregate_fn_name", "weighted_average",
-                "--server_address", "127.0.0.1:2333",
-                "--fps", "20"
-            ]
-        }
-    ]
-}
+// {
+//     // Use IntelliSense to learn about possible attributes.
+//     // Hover to view descriptions of existing attributes.
+//     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+//     "version": "0.2.0",
+//     "configurations": [
+//         {
+//             "name": "Python Debugger: Current File",
+//             "type": "debugpy",
+//             "request": "launch",
+//             // "program": "${workspaceFolder}/src/lerobot/async_inference/robot_client.py",
+//             "module": "lerobot.async_inference.robot_client",
+//             "console": "integratedTerminal",
+//             "cwd": "${workspaceFolder}",
+//             "justMyCode": false,
+//             // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
+//             "args": [
+//                 "--policy_type", "pi0",
+//                 "--pretrained_name_or_path", "/data/chenzhen/tmp/lerobot/outputs/pi0_training_20260817_1/checkpoints/030000/merged_model",
+//                 "--robot.type", "so101_follower",
+//                 "--robot.port", "COM24",
+//                 "--robot.id", "follower_arm",
+//                 "--robot.cameras", "{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}, handeye: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}}",
+//                 "--actions_per_chunk", "50",
+//                 "--task", "Grab the ball",
+//                 "--policy_device", "cuda",
+//                 "--client_device", "cpu",
+//                 "--chunk_size_threshold", "0.5",                 // 动作执行完百分之 50 后，发送一次 obs 数据到服务器
+//                 "--aggregate_fn_name", "weighted_average",
+//                 "--server_address", "127.0.0.1:2333",
+//                 "--fps", "20"                                    // 动作执行频率
+//             ]
+//         }
+//     ]
+// }
 
 
 // ===========================================================================
@@ -305,7 +305,7 @@
 //                 "--task", "Grab the ball",
 //                 "--device", "cuda",
 //                 "--duration", "1000",
-//                 "--fps", "30",
+//                 "--fps", "30",             
 //                 // "--display_data", "true",
 //                 // "--display_mode", "rerun"
 //             ]
@@ -364,6 +364,45 @@
 
 // ----------------------------------------------------------------------------------------------------------
 
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/lerobot/scripts/lerobot_rollout.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
+            "args": [
+                "--strategy.type", "base",
+                "--policy.path", "D:\\worksp\\projects\\lerobot_kit\\outputs\\smolvla_training_20260821_3\\pretrained_model",
+                // "--inference.type", "sync",
+                "--inference.type", "rtc",
+                "--inference.rtc.execution_horizon", "20",   // 要大于等于实际的 inference_delay 数, 小于等于 total_step - inference_delay
+                "--inference.rtc.max_guidance_weight", "5",
+                "--robot.type", "so101_follower",
+                "--robot.port", "COM24",
+                "--robot.id", "follower_arm",
+                "--robot.cameras", "{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}, handeye: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}}",
+                "--task", "Grab the ball",
+                "--device", "cuda",
+                "--duration", "1000",
+                "--fps", "20",
+                // "--display_data", "true",
+                // "--display_mode", "rerun"
+            ]
+        }
+    ]
+}
+
+// ----------------------------------------------------------------------------------------------------------
+
 // {
 //     // Use IntelliSense to learn about possible attributes.
 //     // Hover to view descriptions of existing attributes.
@@ -374,34 +413,31 @@
 //             "name": "Python Debugger: Current File",
 //             "type": "debugpy",
 //             "request": "launch",
-//             "program": "${workspaceFolder}/src/lerobot/scripts/lerobot_rollout.py",
+//             // "program": "${workspaceFolder}/src/lerobot/async_inference/robot_client.py",
+//             "module": "lerobot.async_inference.robot_client",
 //             "console": "integratedTerminal",
 //             "cwd": "${workspaceFolder}",
 //             "justMyCode": false,
 //             // "python": "d:\\soft\\miniconda\\envs\\lerobot\\python.exe",
 //             "args": [
-//                 "--strategy.type", "base",
-//                 "--policy.path", "D:\\worksp\\projects\\lerobot_kit\\outputs\\smolvla_training_20260821_3\\pretrained_model",
-//                 // "--inference.type", "sync",
-//                 "--inference.type", "rtc",
-//                 "--inference.rtc.execution_horizon", "20",   // 要大于等于实际的 inference_delay 数, 小于等于 total_step - inference_delay
-//                 "--inference.rtc.max_guidance_weight", "5",
+//                 "--policy_type", "smolvla",
+//                 "--pretrained_name_or_path", "/data/chenzhen/tmp/lerobot/outputs/smolvla_training_20260821_1/checkpoints/060000/pretrained_model",
 //                 "--robot.type", "so101_follower",
 //                 "--robot.port", "COM24",
 //                 "--robot.id", "follower_arm",
 //                 "--robot.cameras", "{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}, handeye: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}}",
+//                 "--actions_per_chunk", "50",
 //                 "--task", "Grab the ball",
-//                 "--device", "cuda",
-//                 "--duration", "1000",
-//                 "--fps", "30",
-//                 // "--display_data", "true",
-//                 // "--display_mode", "rerun"
+//                 "--policy_device", "cuda",
+//                 "--client_device", "cpu",
+//                 "--chunk_size_threshold", "0.5",
+//                 "--aggregate_fn_name", "latest_only",
+//                 "--server_address", "127.0.0.1:2333",
+//                 "--fps", "20"
 //             ]
 //         }
 //     ]
 // }
-
-
 
 
 

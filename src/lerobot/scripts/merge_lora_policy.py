@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Merge a LeRobot PEFT adapter into its base policy."""
+"""Merge a LeRobot PEFT adapter into its base policy.
+
+Example:
+uv run python src/lerobot/scripts/merge_lora_policy.py \
+  outputs/pi0_training_20260817_1/checkpoints/030000/pretrained_model \
+  outputs/pi0_training_20260817_1/checkpoints/030000/merged_model \
+  --policy-type pi0
+
+"""
 
 import argparse
 import json

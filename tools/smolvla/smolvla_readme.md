@@ -30,10 +30,10 @@ bash tools/smolvla/01_dist_train.sh
 ```
 
 ## 04 本地主机上 rollout
-从服务器中下载 Peft 的权重，在脚本 `04_rollout.sh` 配置好预训练权重路径以及 Peft 权重路径, 在本地主机上执行下述脚本进行 rollout:
+从服务器中下载训练好的权重，在脚本 `02_rollout.sh` 配置好权重路径, 在本地主机上执行下述脚本进行 rollout:
 ```
 bash tools/smolvla/02_rollout.sh
 ```
 
-[![ACT-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
+[![smolvla-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
