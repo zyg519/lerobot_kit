@@ -42,7 +42,7 @@ GROOT_N1_5_REMOVAL_GUIDANCE = (
     "(model_version='n1.7', base model nvidia/GR00T-N1.7-3B)."
 )
 GROOT_N1_7_BASE_MODEL = "nvidia/GR00T-N1.7-3B"
-GROOT_N1_7_BACKBONE_MODEL = "nvidia/Cosmos-Reason2-2B"
+GROOT_N1_7_BACKBONE_MODEL = "/home/zyg/.cache/modelscope/models/nv-community--Cosmos-Reason2-2B/snapshots/master"#"nvidia/Cosmos-Reason2-2B"
 # Default GR00T N1.7 training resolution. Fallback if processor_config lacks sizing. Prevents mismatched
 # full-res patchification by forcing a resize. Mirrored by GR00T_N1_7_DEFAULTS in groot_n1_7.py.
 N1_7_DEFAULT_IMAGE_TARGET_SIZE = (256, 256)
