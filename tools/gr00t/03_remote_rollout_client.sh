@@ -23,9 +23,11 @@ CAMERAS='{ front: {type: opencv, index_or_path: 0, width: 640, height: 480, fps:
 
 
 # if you want to inference in rtc mode, uncomment the following code
+# LoRA 训练产物是 adapter 目录，policy_server 不支持直接加载；
+# 需先在训练机上运行 merge_lora_policy.py 合并（见 gr00t_readme.md），再指向 merged_model。
 python -m lerobot.async_inference.robot_client \
     --policy_type="groot" \
-    --pretrained_name_or_path="/data/chenzhen/tmp/lerobot/outputs/gr00t_training_20260822_1/checkpoints/030000/pretrained_model" \
+    --pretrained_name_or_path="/data/chenzhen/tmp/lerobot/outputs/gr00t_lora_training_20260823_1/checkpoints/030000/merged_model" \
     --robot.type="so101_follower" \
     --robot.port="COM24" \
     --robot.id="follower_arm" \

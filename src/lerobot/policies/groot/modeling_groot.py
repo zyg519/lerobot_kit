@@ -80,6 +80,8 @@ class GrootPolicy(PreTrainedPolicy):
 
         # Initialize GR00T model using ported components
         self._groot_model = self._create_groot_model()
+        # Identity used by PEFT to record the adapter's base_model_name_or_path when wrapping.
+        self.name_or_path = str(config.base_model_path)
         self._action_queue_steps = self._resolve_action_queue_steps()
         self._warned_native_relative_rtc_prefix_disabled = False
 
@@ -122,6 +124,49 @@ class GrootPolicy(PreTrainedPolicy):
         for parameter in model.parameters():
             if parameter.is_floating_point():
                 parameter.data = parameter.data.to(torch.float32)
+
+    def _get_default_peft_targets(self) -> dict[str, any]:
+        """Return default PEFT target modules for GR00T fine-tuning.
+
+        `all-linear` lets PEFT match every ``nn.Linear`` across the whole model --
+        the Qwen3-VL backbone (LLM + vision tower), the state/action projectors and
+        the DiT action head -- while leaving embeddings and normalization layers
+        untouched. Matches the PI0 LoRA convention.
+        """
+        return {
+            "target_modules": "all-linear",
+            "modules_to_save": [],
+        }
+
+    def _validate_peft_config(self, peft_config) -> None:
+        """Validate the PEFT configuration for GR00T.
+
+        The base ``_validate_peft_config`` requires ``pretrained_path``, but GR00T's
+        base checkpoint is addressed through ``base_model_path`` (a raw NVIDIA
+        checkpoint has no LeRobot ``type`` field and is only loadable through it), so
+        either one is sufficient.
+        """
+        if not self.config.pretrained_path and not self.config.base_model_path:
+            raise ValueError(
+                "Training GR00T from scratch using PEFT is unlikely to yield good results. "
+                "Supply a `policy.pretrained_path` or `policy.base_model_path` to fine-tune an existing model."
+            )
+
+    def wrap_with_peft(
+        self,
+        peft_config=None,
+        peft_cli_overrides: dict | None = None,
+    ) -> PreTrainedPolicy:
+        """Wrap this policy with PEFT adapters (see ``PreTrainedPolicy.wrap_with_peft``).
+
+        Also records the GR00T base checkpoint path on ``name_or_path`` before
+        wrapping: PEFT reads it at wrap time to fill the adapter config's
+        ``base_model_name_or_path``, and GR00T's base lives in ``base_model_path``
+        (``--policy.pretrained_path`` may be unset), so the default would otherwise
+        save a null base path and break adapter loading / merging later.
+        """
+        self.name_or_path = str(self.config.pretrained_path or self.config.base_model_path)
+        return super().wrap_with_peft(peft_config, peft_cli_overrides)
 
     @staticmethod
     def _build_weight_decay_parameter_groups(model: torch.nn.Module) -> list[dict[str, object]]:
