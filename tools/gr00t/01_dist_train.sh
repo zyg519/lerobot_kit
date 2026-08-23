@@ -27,11 +27,6 @@ torchrun \
     --policy.pretrained_path="/home/zyg/.cache/modelscope/models/nv-community--GR00T-N1.7-3B/snapshots/master" \
     --policy.base_model_path="/home/zyg/.cache/modelscope/models/nv-community--GR00T-N1.7-3B/snapshots/master" \
     --policy.push_to_hub=false \
-    --policy.tune_llm=false \
-    --policy.tune_projector=true \
-    --policy.tune_visual=true \
-    --policy.tune_diffusion_model=false \
-    --policy.tune_vlln=true \
     --policy.use_bf16=true \
     --policy.model_params_fp32=false \
     --dataset.repo_id="" \
@@ -43,7 +38,7 @@ torchrun \
     --peft.r=8 \
     --peft.lora_alpha=16 \
     --steps=30000 \
-    --batch_size=2 \
+    --batch_size=4 \
     --num_workers=8 \
     --wandb.enable=false \
     --save_checkpoint=true \

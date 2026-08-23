@@ -2,6 +2,12 @@
 
 > GR00T 论文: https://research.nvidia.com/labs/gear/gr00t/
 
+<div align="center">
+
+![Pi0](/tools/gr00t/assets/gr00t.png)
+
+</div>
+
 本目录提供 GR00T N1.7-3B 在 SO-101 机械臂上的 LoRA 微调与远程 rollout 工作流。与仓库内 pi0/smolvla 一致：
 训练只保存 LoRA adapter（几 MB～几十 MB，基座全冻结），训练完成后用 `merge_lora_policy.py` 合并为完整 checkpoint 供部署使用。
 
@@ -16,18 +22,24 @@ bash tools/pi0/02_idle_trim.sh
 
 采集要求与 pi0 相同：动作流畅、删除失败 episode、删除 episode 开头的 idle 帧。
 
-## 02 下载预训练权重
+## 02 删除 leading idle frames
+每个 episode 前的闲置静止的帧是有害的，需要删掉, 运行下述脚本删除
+```
+bash tools/pi0/02_idle_trim.sh
+```
+
+## 03 分布式 LoRA 训练
 
 训练前下载 GR00T N1.7 基座权重，国内使用 ModelScope 较快：
 
 ```
 pip install modelscope
 modelscope download --model nv-community/GR00T-N1.7-3B
+
+modelscope download --model nv-community/Cosmos-Reason2-2B
 ```
 
 在 `01_dist_train.sh` 中把 `--policy.pretrained_path` 与 `--policy.base_model_path` 都配置为下载后的快照路径（默认配置了训练机上的 modelscope 缓存路径）。
-
-## 03 分布式 LoRA 训练
 
 在远程服务器（2×4090）上执行：
 
@@ -77,5 +89,4 @@ bash tools/gr00t/03_remote_rollout_client.sh
 ## 备注
 
 - 远程 rollout 服务端不支持直接加载 adapter 目录；如果 client 报 "找不到 model.safetensors"，请先执行第 04 步合并。
-- LoRA 微调显存占用低于全量微调，`--batch_size` 可从 2 适当调大（如 4）。
 - 基座路径 `nv-community--GR00T-N1.7-3B` 为 ModelScope 镜像名，HuggingFace 原名为 `nvidia/GR00T-N1.7-3B`。
