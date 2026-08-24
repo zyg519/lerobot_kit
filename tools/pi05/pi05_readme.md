@@ -50,8 +50,10 @@ bash tools/pi05/02_romote_rollout_server.sh
 bash tools/pi05/03_remote_rollout_client.sh
 ```
 
-<div align="center">
+[![pi05-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
-[![pi05-SO‑101 机械臂抓球 demo](assets/pi05.gif)](https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
+<!-- <div align="center">
 
-</div>
+[![pi05-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
+
+</div> -->

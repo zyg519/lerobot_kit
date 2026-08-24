@@ -56,10 +56,10 @@ bash tools/pi0/05_romote_rollout_server.sh
 bash tools/pi0/06_remote_rollout_client.sh
 ```
 
+[![pi0-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
+<!-- <div align="center">
 
-<div align="center">
+[![pi0-SO‑101 机械臂抓球 demo](assets/demo_thumb)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
-[![pi0-SO‑101 机械臂抓球 demo](assets/pi0.gif)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
-
-</div>
+</div> -->

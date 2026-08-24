@@ -35,13 +35,13 @@ bash tools/smolvla/01_dist_train.sh
 bash tools/smolvla/02_rollout.sh
 ```
 
+[![smolvla-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
-
-<div align="center">
+<!-- <div align="center">
 
 [![smolvla-SO‑101 机械臂抓球 demo](assets/smolvla.gif)](https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
 
-</div>
+</div> -->
 
 <div align="center">
 
