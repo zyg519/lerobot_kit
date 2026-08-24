@@ -7,9 +7,38 @@
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Pi0-=white" alt="Manifest V3"></a>
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/ACT-=white" alt="Manifest V3"></a>
   <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/SmolVLA-=white" alt="Manifest V3"></a>
+  <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/GR00T-=white" alt="Manifest V3"></a>
+  <a href="https://github.com/yourname/explain_module"><img src="https://img.shields.io/badge/Pi05-=white" alt="Manifest V3"></a>
   <br>
   <!-- <a href="README_EN.md">English</a> -->
 </div>
+
+| ACT | SmolVLA | Pi0 | Pi05|
+| --- | ---     | --- | --- |
+|[![ACT](tools/act/assets/act.gif)](https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![smolvla](tools/smolvla/assets/smolvla.gif)](https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![pi0](tools/pi0/assets/pi0.gif)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![pi05](tools/pi05/assets/pi05.gif)](https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61) |
+
+<p align="center">
+  <a href="https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
+    <img src="tools/act/assets/act.gif" width="220"><br>
+    <b>ACT</b>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
+    <img src="tools/smolvla/assets/smolvla.gif" width="220"><br>
+    <b>SmolVLA</b>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
+    <img src="tools/pi0/assets/pi0.gif" width="220"><br>
+    <b>Pi0</b>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
+    <img src="tools/pi05/assets/pi05.gif" width="220"><br>
+    <b>Pi05</b>
+  </a>
+</p>
+
 
 ## 硬件需求
 
@@ -134,3 +163,5 @@ bash tools/calibration/02_calib_follower_arm.sh
 Low-Cost Hardware](/tools/act/act_readme.md)
 - [SmolVLA: A vision-language-action model
 for affordable and efficient robotics](/tools/smolvla/smolvla_readme.md)
+- [Isaac GR00T N1.7 - Open Reasoning VLA model for Humanoid Robotics](/tools/gr00t/gr00t_readme.md)
+- [π0.5: a Vision-Language-Action Model with Open-World Generalization](/tools/pi05/pi05_readme.md)
