@@ -41,5 +41,10 @@ bash tools/act/01_dist_train.sh
 bash tools/act/02_rollout.sh
 ```
 
-[![ACT-SO‑101 机械臂抓球 demo](assets/demo_thumb.png)](https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
+<div align="center">
+
+[![ACT-SO‑101 机械臂抓球 demo](assets/act.gif)](https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)
+
+</div>
+
 
