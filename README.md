@@ -17,27 +17,6 @@
 | --- | ---     | --- | --- |
 |[![ACT](tools/act/assets/act.gif)](https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![smolvla](tools/smolvla/assets/smolvla.gif)](https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![pi0](tools/pi0/assets/pi0.gif)](https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61)|[![pi05](tools/pi05/assets/pi05.gif)](https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61) |
 
-<p align="center">
-  <a href="https://www.bilibili.com/video/BV1xt8w6oENF/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
-    <img src="tools/act/assets/act.gif" width="220"><br>
-    <b>ACT</b>
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://www.bilibili.com/video/BV1ek8r6SEH6/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
-    <img src="tools/smolvla/assets/smolvla.gif" width="220"><br>
-    <b>SmolVLA</b>
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://www.bilibili.com/video/BV12v876MEYH/?vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
-    <img src="tools/pi0/assets/pi0.gif" width="220"><br>
-    <b>Pi0</b>
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://www.bilibili.com/video/BV1bB8Y6nEqx/?spm_id_from=333.1387.upload.video_card.click&vd_source=d3c91656eb1a8e7284849bfdb83a2d61" target="_blank">
-    <img src="tools/pi05/assets/pi05.gif" width="220"><br>
-    <b>Pi05</b>
-  </a>
-</p>
 
 
 ## 硬件需求
