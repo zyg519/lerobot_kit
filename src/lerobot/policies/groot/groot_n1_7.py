@@ -131,7 +131,7 @@ GR00T_N1_7_DEFAULTS: dict[str, Any] = {
         "dropout": 0.2,
         "final_dropout": True,
     },
-    "num_inference_timesteps": 4,
+    "num_inference_timesteps": 10,
     "noise_beta_alpha": 1.5,
     "noise_beta_beta": 1.0,
     "noise_s": 0.999,
